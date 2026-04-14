@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 import { BadRequest } from "./error";
 
-const SECRET_KEY = process.env.SECRET_KEY || "chave_secreta"
+const SECRET_KEY = process.env.JWT_SECRET || process.env.SECRET_KEY || "chave_secreta"
 
 export interface TokenPayload {
     adminId: string;

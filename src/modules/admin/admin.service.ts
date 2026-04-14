@@ -34,6 +34,7 @@ export const AdminService = {
 
         const token = authUtil.generateToken({
             adminId: user.id,
+            storeId: user.store?.id || "",
             email: user.email
         })
 

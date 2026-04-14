@@ -18,6 +18,16 @@ export const AdminRepository = {
         })
     },
 
+    async findById(id: string) {
+        return prisma.admin.findUnique(
+            {
+                where: { id },
+                include: { store: true }
+            },
+        )
+    },
+
+
     async create(data: CreateAdminSchemaType) {
         return prisma.admin.create({ data })
     }
