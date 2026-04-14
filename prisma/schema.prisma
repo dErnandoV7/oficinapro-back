@@ -1,0 +1,182 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ------------------------------------------------------
+// SEGURANÇA, ACESSO E SAAS (Múltiplas Lojas)
+// ------------------------------------------------------
+model Admin {
+  id        String   @id @default(uuid())
+  name      String
+  email     String  @unique
+  phone     String?  @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store     Store?
+}
+
+model Store {
+  id        String   @id @default(uuid())
+  name      String   // Nome do comércio (Ex: Padaria do João)
+  adminId   String   @unique
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  // Tudo no sistema agora pertence a uma STORE específica
+  wallet       Wallet?
+  clients      Client[]
+  catalogItems CatalogItem[]
+  sales        Sale[]
+}
+
+// ------------------------------------------------------
+// GESTÃO DE CAIXA / CARTEIRA
+// ------------------------------------------------------
+model Wallet {
+  id           String              @id @default(uuid())
+  storeId      String              @unique
+  store        Store               @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  balance      Decimal             @default(0.0)
+  updatedAt    DateTime            @updatedAt
+  transactions WalletTransaction[]
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+model WalletTransaction {
+  id          String          @id @default(uuid())
+  walletId    String
+  wallet      Wallet          @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  type        TransactionType
+  amount      Decimal
+  description String
+  createdAt   DateTime        @default(now())
+}
+
+// ------------------------------------------------------
+// GESTÃO DE CLIENTES
+// ------------------------------------------------------
+model Client {
+  id          String    @id @default(uuid())
+  storeId     String
+  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name        String
+  phone       String?
+  address     String?
+  creditLimit Decimal?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  sales       Sale[]
+  payments    Payment[]
+}
+
+// ------------------------------------------------------
+// CATÁLOGO E ESTOQUE
+// ------------------------------------------------------
+enum ItemType {
+  PRODUCT
+  SERVICE
+}
+
+model CatalogItem {
+  id          String          @id @default(uuid())
+  storeId     String
+  store       Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  type        ItemType        @default(PRODUCT) 
+  name        String
+  description String?
+  category    String?
+  costPrice   Decimal
+  sellPrice   Decimal
+  stock       Int             @default(0)
+  minStock    Int             @default(0)
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  saleItems   SaleItem[]
+  stockMoves  StockMovement[]
+}
+
+enum MovementType {
+  IN
+  OUT
+  ADJUSTMENT
+}
+
+model StockMovement {
+  id            String       @id @default(uuid())
+  catalogItemId String
+  item          CatalogItem  @relation(fields: [catalogItemId], references: [id], onDelete: Cascade)
+  type          MovementType
+  quantity      Int
+  reason        String?
+  createdAt     DateTime     @default(now())
+}
+
+// ------------------------------------------------------
+// GESTÃO DE CONTAS E VENDAS - "FIADO"
+// ------------------------------------------------------
+model Sale {
+  id          String     @id @default(uuid())
+  storeId     String
+  store       Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  
+  clientId    String?    
+  client      Client?    @relation(fields: [clientId], references: [id])
+  
+  customName  String?
+  description String?
+
+  totalAmount Decimal    @default(0.0)
+  amountPaid  Decimal    @default(0.0)
+  isFullyPaid Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  items       SaleItem[]
+  payments    Payment[]
+}
+
+model SaleItem {
+  id            String       @id @default(uuid())
+  saleId        String
+  sale          Sale         @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  
+  catalogItemId String?      
+  item          CatalogItem? @relation(fields: [catalogItemId], references: [id])
+  
+  customDesc    String?      
+  quantity      Int          @default(1)
+  unitPrice     Decimal
+  totalPrice    Decimal
+}
+
+model Payment {
+  id          String   @id @default(uuid())
+  
+  saleId      String?
+  sale        Sale?    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  
+  clientId    String?
+  client      Client?  @relation(fields: [clientId], references: [id])
+  
+  amount      Decimal
+  createdAt   DateTime @default(now())
+}
