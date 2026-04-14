@@ -7,7 +7,7 @@ export const AdminController = {
 
         try {
             const data = req.body as CreateAdminSchemaType
-            const user = AdminService.create(data)
+            const user = await AdminService.create(data)
 
             return res.status(201).json({
                 message: "Conta criada com sucesso!",
