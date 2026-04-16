@@ -12,6 +12,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: ["http://localhost:3000"],
+    credentials: true,
   })
 );
 
@@ -21,7 +22,7 @@ app.get('/health', (_req, res) => {
   res.status(200).json({ ok: true });
 });
 
-const port = Number(process.env.PORT ?? 3000);
+const port = Number(process.env.PORT ?? 3030);
 
 app.use(errorHandler);
 

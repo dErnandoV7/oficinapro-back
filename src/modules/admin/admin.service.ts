@@ -1,6 +1,6 @@
-import { CreateAdminSchemaType, LoginAdminSchemaType } from "../../common/schemas/admin.schemas"
+import { CreateAdminSchemaType, CreateStoreSchemaType, LoginAdminSchemaType } from "../../common/schemas/admin.schemas"
 import { BadRequest, ConflictError, NotFoundError } from "../../common/utils/error"
-import { comparePassword } from "../../common/utils/hash"
+import { comparePassword, hashPassword } from "../../common/utils/hash"
 import { authUtil } from "../../common/utils/jwt"
 import { AdminRepository } from "./admin.repository"
 
@@ -14,7 +14,9 @@ export const AdminService = {
             throw new ConflictError("Os dados informados já estão em uso no sistema.")
         }
 
-        return await AdminRepository.create(data)
+        const passwordHash = await hashPassword(password)
+
+        return await AdminRepository.create({ ...data, password: passwordHash })
     },
 
     async login(data: LoginAdminSchemaType) {
@@ -45,6 +47,31 @@ export const AdminService = {
                 phone: user.phone,
                 store: user.store
             },
+            token
+        }
+    },
+
+    async createStore(data: CreateStoreSchemaType, adminId: string) {
+        const admin = await AdminRepository.findById(adminId)
+
+        if (!admin) {
+            throw new NotFoundError("Admin não encontrado.")
+        }
+
+        if (admin.store) {
+            throw new ConflictError("Este admin já possui uma loja cadastrada.")
+        }
+
+        const store = await AdminRepository.createStore(admin.id, data.name)
+
+        const token = authUtil.generateToken({
+            adminId: admin.id,
+            storeId: store.id,
+            email: admin.email
+        })
+
+        return {
+            store,
             token
         }
     }

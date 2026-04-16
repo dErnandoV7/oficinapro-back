@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express"
-import { CreateClientSchemaType, DeleteClientSchemaType, EditClientParamsSchemaType, EditClientSchemaType } from "../../common/schemas/client.schemas"
+import { ClientProfileParamsSchemaType, CreateClientSchemaType, DeleteClientSchemaType, EditClientParamsSchemaType, EditClientSchemaType, GetClientParamsSchemaType, ListClientsQuerySchemaType } from "../../common/schemas/client.schemas"
 import { BadRequest } from "../../common/utils/error"
 import { ClientService } from "./client.service"
 
@@ -62,6 +62,66 @@ export const ClientController = {
             return res.status(200).json({
                 message: "Cliente removido com sucesso!",
                 data: client
+            })
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async list(req: Request, res: Response, next: NextFunction) {
+        const storeId = res.locals.storeId
+
+        try {
+            if (!storeId) {
+                throw new BadRequest("Token inválido ou ausente.")
+            }
+
+            const filters = req.query as ListClientsQuerySchemaType
+            const clients = await ClientService.list(filters, storeId)
+
+            return res.status(200).json({
+                message: "Clientes buscados com sucesso!",
+                data: clients
+            })
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async getById(req: Request, res: Response, next: NextFunction) {
+        const storeId = res.locals.storeId
+
+        try {
+            if (!storeId) {
+                throw new BadRequest("Token inválido ou ausente.")
+            }
+
+            const { clientId } = req.params as GetClientParamsSchemaType
+            const client = await ClientService.getById(clientId, storeId)
+
+            return res.status(200).json({
+                message: "Cliente buscado com sucesso!",
+                data: client
+            })
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async profile(req: Request, res: Response, next: NextFunction) {
+        const storeId = res.locals.storeId
+
+        try {
+            if (!storeId) {
+                throw new BadRequest("Token inválido ou ausente.")
+            }
+
+            const { clientId } = req.params as ClientProfileParamsSchemaType
+            const profile = await ClientService.profile(clientId, storeId)
+
+            return res.status(200).json({
+                message: "Dados buscados com sucesso!",
+                data: profile
             })
         } catch (error) {
             next(error)

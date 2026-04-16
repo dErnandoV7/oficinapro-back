@@ -23,3 +23,12 @@ export const LoginAdminSchema = z.object({
 
 export type CreateAdminSchemaType = z.infer<typeof CreateAdminSchema>["body"]
 export type LoginAdminSchemaType = z.infer<typeof LoginAdminSchema>["body"]
+
+export const CreateStoreSchema = z.object({
+    body: z.object({
+        name: z.string()
+            .min(3, "O nome da loja deve ter pelo menos 3 caracteres")
+    })
+})
+
+export type CreateStoreSchemaType = z.infer<typeof CreateStoreSchema>["body"]

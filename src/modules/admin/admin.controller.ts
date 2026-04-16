@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express"
-import { CreateAdminSchemaType, LoginAdminSchemaType } from "../../common/schemas/admin.schemas"
+import { CreateAdminSchemaType, CreateStoreSchemaType, LoginAdminSchemaType } from "../../common/schemas/admin.schemas"
+import { BadRequest } from "../../common/utils/error"
 import { AdminService } from "./admin.service"
 
 export const AdminController = {
@@ -27,6 +28,26 @@ export const AdminController = {
             return res.status(200).json({
                 message: "Login realizado com sucesso!",
                 data: user
+            })
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async createStore(req: Request, res: Response, next: NextFunction) {
+        const adminId = res.locals.userId
+
+        try {
+            if (!adminId) {
+                throw new BadRequest("Token inválido ou ausente.")
+            }
+
+            const data = req.body as CreateStoreSchemaType
+            const result = await AdminService.createStore(data, adminId)
+
+            return res.status(201).json({
+                message: "Loja criada com sucesso!",
+                data: result
             })
         } catch (error) {
             next(error)

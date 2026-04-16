@@ -27,8 +27,16 @@ export const AdminRepository = {
         )
     },
 
-
     async create(data: CreateAdminSchemaType) {
         return prisma.admin.create({ data })
+    },
+
+    async createStore(adminId: string, name: string) {
+        return prisma.store.create({
+            data: {
+                adminId,
+                name,
+            },
+        })
     }
 }
