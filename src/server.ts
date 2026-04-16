@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 
 import { routes } from "./routes";
 import { errorHandler } from "./common/middlewares/errorMiddleware";
@@ -7,6 +8,12 @@ import { errorHandler } from "./common/middlewares/errorMiddleware";
 const app = express();
 
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: ["http://localhost:3000"],
+  })
+);
 
 app.use(routes);
 
