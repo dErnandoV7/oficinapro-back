@@ -6,6 +6,9 @@ import { CreateClientSchemaType, EditClientSchemaType } from "../../common/schem
 type ListClientsFilters = {
     storeId: string
     q?: string
+    isActive?: "true" | "false"
+    sortBy?: "creditLimit"
+    order?: "asc" | "desc"
 }
 
 export const ClientRepository = {
@@ -17,10 +20,11 @@ export const ClientRepository = {
         return prisma.client.findUnique({ where: { id } })
     },
 
-    async list({ storeId, q }: ListClientsFilters) {
+    async list({ storeId, q, isActive, sortBy, order }: ListClientsFilters) {
         return prisma.client.findMany({
             where: {
                 storeId,
+                ...(isActive !== undefined ? { isActive: isActive === "true" } : {}),
                 ...(q
                     ? {
                         OR: [
@@ -30,9 +34,9 @@ export const ClientRepository = {
                     }
                     : {}),
             },
-            orderBy: {
-                name: "asc",
-            },
+            orderBy: sortBy
+                ? { [sortBy]: order ?? "asc" }
+                : { name: "asc" },
         })
     },
 

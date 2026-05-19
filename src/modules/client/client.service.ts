@@ -54,6 +54,9 @@ export const ClientService = {
         return await ClientRepository.list({
             storeId,
             q: filters.q,
+            isActive: filters.isActive,
+            sortBy: filters.sortBy,
+            order: filters.order,
         })
     },
 

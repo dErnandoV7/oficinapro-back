@@ -29,10 +29,12 @@ export const ProductServiceRepository = {
         return { ...item, costPrice: Number(item.costPrice), sellPrice: Number(item.sellPrice) }
     },
 
-    async list({ order, search }: ListProductServiceTypes, storeId: string) {
+    async list({ order, search, type, isActive, sortBy }: ListProductServiceTypes, storeId: string) {
         const items = await prisma.catalogItem.findMany({
             where: {
                 storeId,
+                ...(type ? { type } : {}),
+                ...(isActive !== undefined ? { isActive: isActive === "true" } : {}),
                 ...(search ? {
                     OR: [
                         { name: { contains: search, mode: "insensitive" } },
@@ -41,7 +43,7 @@ export const ProductServiceRepository = {
                 } : {})
             },
 
-            orderBy: order ? { stock: order } : undefined,
+            orderBy: sortBy ? { [sortBy]: order ?? "asc" } : undefined,
 
             select: {
                 id: true,

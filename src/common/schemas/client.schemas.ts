@@ -1,5 +1,7 @@
 import z from "zod"
 
+export const ClientSortBy = ["creditLimit"] as const
+
 export const CreateClientSchema = z.object({
     body: z.object({
         name: z.string()
@@ -59,6 +61,15 @@ export const ListClientsSchema = z.object({
     query: z.object({
         q: z.string()
             .min(1, "A busca (q) não pode ser vazia")
+            .optional(),
+
+        isActive: z.enum(["true", "false"])
+            .optional(),
+
+        sortBy: z.enum(ClientSortBy)
+            .optional(),
+
+        order: z.enum(["asc", "desc"])
             .optional(),
     })
 })

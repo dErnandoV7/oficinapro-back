@@ -4,6 +4,8 @@ export const Order = ["asc", "desc"] as const
 
 export const ItemType = ["PRODUCT", "SERVICE"] as const
 
+export const ProductSortBy = ["sellPrice", "costPrice", "stock"] as const
+
 export const CreateProductServiceSchema = z.object({
     body: z.object({
         type: z.enum(ItemType),
@@ -69,6 +71,15 @@ export const DeleteProductServiceSchema = z.object({
 export const ListProductServiceSchema = z.object({
     query: z.object({
         search: z.string()
+            .optional(),
+
+        type: z.enum(ItemType)
+            .optional(),
+
+        isActive: z.enum(["true", "false"])
+            .optional(),
+
+        sortBy: z.enum(ProductSortBy)
             .optional(),
 
         order: z.enum(Order)
