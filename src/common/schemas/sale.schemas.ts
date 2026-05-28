@@ -42,7 +42,7 @@ export const CreateSaleSchema = z.object({
 export const ListSalesSchema = z.object({
     query: z.object({
         clientId: z.string().uuid("clientId inválido.").optional(),
-        isFullyPaid: z.enum(["true", "false"]).optional(),
+        paymentStatus: z.enum(["pendente", "parcial", "pago"]).optional(),
     }),
 })
 

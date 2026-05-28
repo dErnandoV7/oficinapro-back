@@ -71,13 +71,17 @@ export const SaleRepository = {
     },
 
     async list(storeId: string, filters: ListSalesTypes) {
+        const paymentFilter =
+            filters.paymentStatus === "pago" ? { isFullyPaid: true } :
+            filters.paymentStatus === "parcial" ? { isFullyPaid: false, amountPaid: { gt: 0 } } :
+            filters.paymentStatus === "pendente" ? { isFullyPaid: false, amountPaid: 0 } :
+            {}
+
         return prisma.sale.findMany({
             where: {
                 storeId,
                 ...(filters.clientId ? { clientId: filters.clientId } : {}),
-                ...(filters.isFullyPaid !== undefined
-                    ? { isFullyPaid: filters.isFullyPaid === "true" }
-                    : {}),
+                ...paymentFilter,
             },
             select: {
                 id: true,
