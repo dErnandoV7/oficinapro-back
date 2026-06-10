@@ -4,6 +4,7 @@ import { adminRoutes } from "./admin.routes";
 import { clientRoutes } from "./client.routes";
 import { productRoutes } from "./product.routes";
 import { saleRoutes } from "./sale.routes";
+import { paymentRoutes } from "./payment.routes";
 
 const routes = Router();
 
@@ -15,5 +16,6 @@ routes.use("/admin", adminRoutes);
 routes.use("/clients", clientRoutes);
 routes.use("/products", productRoutes);
 routes.use("/sales", saleRoutes);
+routes.use("/payments", paymentRoutes);
 
 export { routes };

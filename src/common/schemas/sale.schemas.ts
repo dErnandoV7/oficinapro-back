@@ -39,10 +39,14 @@ export const CreateSaleSchema = z.object({
     }),
 })
 
+export const SaleSortBy = ["createdAt", "totalAmount", "status", "customName", "client"] as const
+
 export const ListSalesSchema = z.object({
     query: z.object({
         clientId: z.string().uuid("clientId inválido.").optional(),
         paymentStatus: z.enum(["pendente", "parcial", "pago"]).optional(),
+        sortBy: z.enum(SaleSortBy).optional(),
+        order: z.enum(["asc", "desc"]).optional(),
     }),
 })
 

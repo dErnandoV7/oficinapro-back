@@ -1,5 +1,24 @@
+import { Prisma } from "@prisma/client"
+
 import { prisma } from "../../config/database"
 import { ListSalesTypes } from "../../common/schemas/sale.schemas"
+
+const buildOrderBy = (sortBy?: string, order?: "asc" | "desc"): Prisma.SaleOrderByWithRelationInput | Prisma.SaleOrderByWithRelationInput[] => {
+    const direction = order ?? "desc"
+
+    switch (sortBy) {
+        case "totalAmount":
+            return { totalAmount: direction }
+        case "status":
+            return [{ isFullyPaid: direction }, { amountPaid: direction }]
+        case "customName":
+            return { customName: direction }
+        case "client":
+            return { client: { name: direction } }
+        default:
+            return { createdAt: direction }
+    }
+}
 
 type CreateSaleData = {
     storeId: string
@@ -92,10 +111,10 @@ export const SaleRepository = {
                 amountPaid: true,
                 isFullyPaid: true,
                 createdAt: true,
-                client: { select: { id: true, name: true } },
+                client: { select: { id: true, name: true, phone: true } },
                 _count: { select: { items: true } },
             },
-            orderBy: { createdAt: "desc" },
+            orderBy: buildOrderBy(filters.sortBy, filters.order),
         })
     },
 

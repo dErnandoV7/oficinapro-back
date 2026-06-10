@@ -52,6 +52,9 @@ export const EditProductServiceSchema = z.object({
             .optional(),
 
         minStock: z.number()
+            .optional(),
+
+        isActive: z.boolean()
             .optional()
     }),
 
