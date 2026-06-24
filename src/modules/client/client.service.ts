@@ -43,6 +43,11 @@ export const ClientService = {
             throw new BadRequest("O cliente não existe.")
         }
 
+        const debtSummary = await ClientRepository.getDebtSummary(clientId, storeId)
+        if (debtSummary.outstanding.greaterThan(0)) {
+            throw new BadRequest("Não é possível excluir um cliente com saldo devedor em aberto.")
+        }
+
         return await ClientRepository.delete(clientId)
     },
 

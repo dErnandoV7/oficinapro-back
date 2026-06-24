@@ -97,9 +97,21 @@ export const GetProductServiceSchema = z.object({
     })
 })
 
+export const RestockProductSchema = z.object({
+    params: z.object({
+        productId: z.string().min(1, "O id do produto/serviço é obrigatório")
+    }),
+    body: z.object({
+        quantity: z.number().int().min(0, "O estoque deve ser um número inteiro maior ou igual a zero."),
+        reason: z.string().min(1).optional()
+    })
+})
+
 export type CreateProductServiceTypes = z.infer<typeof CreateProductServiceSchema>["body"]
 export type EditProductServiceTypes = z.infer<typeof EditProductServiceSchema>["body"]
 export type EditProductServiceParamsTypes = z.infer<typeof EditProductServiceSchema>["params"]
 export type DeleteProductServiceTypes = z.infer<typeof DeleteProductServiceSchema>["params"]
 export type GetProductServiceTypes = z.infer<typeof GetProductServiceSchema>["params"]
 export type ListProductServiceTypes = z.infer<typeof ListProductServiceSchema>["query"]
+export type RestockProductTypes = z.infer<typeof RestockProductSchema>["body"]
+export type RestockProductParamsTypes = z.infer<typeof RestockProductSchema>["params"]

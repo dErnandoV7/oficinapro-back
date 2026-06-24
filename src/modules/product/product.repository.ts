@@ -29,6 +29,26 @@ export const ProductServiceRepository = {
         return { ...item, costPrice: Number(item.costPrice), sellPrice: Number(item.sellPrice) }
     },
 
+    async restock(productId: string, quantity: number, reason?: string) {
+        return prisma.$transaction(async (tx) => {
+            const updated = await tx.catalogItem.update({
+                where: { id: productId },
+                data: { stock: quantity }
+            })
+
+            await tx.stockMovement.create({
+                data: {
+                    catalogItemId: productId,
+                    type: "ADJUSTMENT",
+                    quantity,
+                    reason: reason ?? "Ajuste de estoque"
+                }
+            })
+
+            return { ...updated, costPrice: Number(updated.costPrice), sellPrice: Number(updated.sellPrice) }
+        })
+    },
+
     async list({ order, search, type, isActive, sortBy }: ListProductServiceTypes, storeId: string) {
         const items = await prisma.catalogItem.findMany({
             where: {

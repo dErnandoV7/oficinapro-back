@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
-import { BadRequest } from "../../common/utils/error"
-import { CreateProductServiceTypes, EditProductServiceTypes, EditProductServiceParamsTypes, DeleteProductServiceTypes, GetProductServiceTypes, ListProductServiceTypes } from "../../common/schemas/product.schemas"
+import { BadRequest, NotFoundError } from "../../common/utils/error"
+import { CreateProductServiceTypes, EditProductServiceTypes, EditProductServiceParamsTypes, DeleteProductServiceTypes, GetProductServiceTypes, ListProductServiceTypes, RestockProductTypes, RestockProductParamsTypes } from "../../common/schemas/product.schemas"
 import { ProductServiceRepository } from "./product.repository"
 
 export const ProductServiceController = {
@@ -88,6 +88,30 @@ export const ProductServiceController = {
             return res.status(200).json({
                 message: "Produto encontrado.",
                 data: product
+            })
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async restock(req: Request, res: Response, next: NextFunction) {
+        const storeId = res.locals.storeId
+
+        try {
+            if (!storeId) throw new BadRequest("Token inválido ou ausente.")
+
+            const { productId } = req.params as RestockProductParamsTypes
+            const { quantity, reason } = req.body as RestockProductTypes
+
+            const product = await ProductServiceRepository.findById(productId, storeId)
+            if (!product) throw new NotFoundError("Produto não encontrado.")
+            if (product.type === "SERVICE") throw new BadRequest("Não é possível reabastecer um serviço.")
+
+            const updated = await ProductServiceRepository.restock(productId, quantity, reason)
+
+            return res.status(200).json({
+                message: `Estoque de "${updated.name}" atualizado para ${quantity} unidades.`,
+                data: updated
             })
         } catch (error) {
             next(error)

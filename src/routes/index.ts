@@ -5,6 +5,7 @@ import { clientRoutes } from "./client.routes";
 import { productRoutes } from "./product.routes";
 import { saleRoutes } from "./sale.routes";
 import { paymentRoutes } from "./payment.routes";
+import { dashboardRoutes } from "./dashboard.routes";
 
 const routes = Router();
 
@@ -17,5 +18,6 @@ routes.use("/clients", clientRoutes);
 routes.use("/products", productRoutes);
 routes.use("/sales", saleRoutes);
 routes.use("/payments", paymentRoutes);
+routes.use("/dashboard", dashboardRoutes);
 
 export { routes };
