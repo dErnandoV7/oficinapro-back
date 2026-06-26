@@ -13,6 +13,7 @@ Back-end do sistema de gestão de oficina mecânica.
 - [Jest](https://jestjs.io/) para testes unitários
 
 ## Estrutura de pastas
+```
 back/
 ├── prisma/           # schema e migrações do banco de dados
 ├── src/
@@ -21,7 +22,7 @@ back/
 │   ├── modules/      # lógica de negócio por entidade
 │   ├── routes/       # definições de rotas da API
 │   └── server.ts     # ponto de entrada da aplicação
-
+```
 ## Funcionalidades
 
 - Autenticação (login e cadastro) com JWT
